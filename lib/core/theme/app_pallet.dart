@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart ';
+import 'package:flutter/material.dart';
 
 class AppPallet {
   static const Color backgroundColor = Color.fromRGBO(24,24,32,1);

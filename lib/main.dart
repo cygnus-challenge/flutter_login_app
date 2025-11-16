@@ -1,10 +1,8 @@
 import 'package:auth_app/core/theme/theme.dart';
+import '/../data/models/user.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:auth_app/features/home/cubit/user_cubit.dart';
-import 'package:auth_app/features/home/view/home_page.dart';
-import 'package:auth_app/features/auth/cubit/login_cubit.dart';
-import 'package:auth_app/features/auth/views/login_page.dart';
+import 'package:auth_app/features/home/page/home_page.dart';
+import 'package:auth_app/features/auth/page/login_page.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -19,17 +17,23 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Auth with BloC App',
       theme: AppTheme.darkThemeMode,
-      routes: {
-        '/': (context) => BlocProvider(
-          create: (_) => LoginCubit(),
-          child: LoginPage()
-        ),
-        '/home': (context) => BlocProvider(
-          create: (_) => UserCubit()..loadUsers(),
-          child: const HomePage(), 
-        ),
+      initialRoute: '/login',
+      onGenerateRoute: (settings){
+        switch (settings.name) {
+          case '/login':
+            return MaterialPageRoute(
+              builder: (context) => LoginPage(),
+            );
+          case '/home':
+            return MaterialPageRoute(
+              builder: (context) => 
+              HomePage(authenticatedUser: settings.arguments as User),
+              settings: settings,
+            );
+          default:
+          return null;
+        }
       },
-      initialRoute: '/',
     );
   }
 }
