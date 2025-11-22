@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
           case '/home':
             return MaterialPageRoute(
               builder: (context) => 
-              HomePage(authenticatedUser: settings.arguments as User),
+              HomePage(authenticatedUser: settings.arguments as User?),
               settings: settings,
             );
           default:

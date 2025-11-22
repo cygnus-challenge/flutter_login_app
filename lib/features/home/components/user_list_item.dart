@@ -13,7 +13,7 @@ class UserListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Thiết kế mỗi mục trong danh sách người dùng
+    // Card
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(
@@ -28,15 +28,16 @@ class UserListItem extends StatelessWidget {
             style: const TextStyle(color: AppPallet.whiteCcolor),
           ),
         ),
-        title: Text(user.username,
-            style: const TextStyle(
-              color: AppPallet.whiteCcolor, 
-              fontWeight: FontWeight.bold,
-            )),
+        title: Text(
+          user.username,
+          style: const TextStyle(
+            color: AppPallet.whiteCcolor, 
+            fontWeight: FontWeight.bold,
+          )),
         subtitle: Text(user.email!),
         trailing: const Icon(
           Icons.arrow_forward_ios_rounded,
-          size: 16, color: AppPallet.greyColor
+          size: 16, color: Color.fromARGB(255, 158, 158, 158)
         ),
       ),
     );

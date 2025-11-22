@@ -1,16 +1,17 @@
-import '/../data/models/user.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '/../data/models/user.dart';
 import 'user_state.dart';
 
 class UserController extends Cubit<UserState> {
-  UserController() : super(UserInitial());
+  UserController() : super(UserSuccess());
 
   final List<User> _allFakeUsers = List.generate(
     48,
     (index) => User(
       id: '${index + 1}',
       username: 'User ${index + 1}',
-      email: 'user${index + 1}@gmail.com', password: '',
+      email: 'user${index + 1}@gmail.com',
+      password: '',
     ),
   );
 
@@ -18,56 +19,26 @@ class UserController extends Cubit<UserState> {
 
   bool _isLoadingMore = false;
 
-  int get totalUsersCount => _allFakeUsers.length;
+  final List<User> users = [];
 
-  // Call API
-  Future<void> loadUsers() async {
-    if (state is UserLoading) return;
-
-    emit(UserLoading());
-    try {
-      await Future.delayed(const Duration(seconds: 1));
-
-      final users = _allFakeUsers.take(_pageSize).toList();
-
-      emit(UserSuccess(
-        users: users,
-        hasReachedMax: users.length == _allFakeUsers.length,
-      ));
-    } catch (e) {
-      emit(UserError('Don\'t download user list: ${e.toString()}'));
-    } 
-  }
-
-  Future<void> loadMoreUsers() async {
-    if (_isLoadingMore || state is! UserSuccess) return;
-
-    final currentState = state as UserSuccess;
-
-    if (currentState.hasReachedMax) return;
-
+  Future loadUsers() async {
+    if (_isLoadingMore) return;
     _isLoadingMore = true;
 
-    try {
-      await Future.delayed(const Duration(seconds: 1));
+    if (state is! UserSuccess) return;
 
-      final currentCount = currentState.users.length;
+    await Future.delayed(const Duration(seconds: 1));
+    final newUsers = _allFakeUsers.skip(users.length).take(_pageSize).toList();
 
-      final newUsers = _allFakeUsers
-          .skip(currentCount)
-          .take(_pageSize)
-          .toList();
+    users.addAll(newUsers);
+    emit(
+      UserSuccess(
+        users: users,
+        length: users.length,
+        hasReachedMax: newUsers.length < _pageSize,
+      ),
+    );
 
-      emit(currentState.copyWith(
-        users: List.of(currentState.users)..addAll(newUsers),
-        hasReachedMax: newUsers.isEmpty ||
-        (currentCount + newUsers.length) ==
-        _allFakeUsers.length,
-      ));
-    } catch (e) {
-      print('Lỗi khi tải thêm: ${e.toString()}');
-    } finally {
-      _isLoadingMore = false;
-    }
+    _isLoadingMore = false;
   }
 }

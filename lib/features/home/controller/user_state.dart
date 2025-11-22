@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:auth_app/data/models/user.dart';
+import '/../data/models/user.dart';
 
 // State of User Cubit
 abstract class UserState extends Equatable {
@@ -10,37 +10,27 @@ abstract class UserState extends Equatable {
 
 class UserInitial extends UserState {}
 
-class UserLoading extends UserState {}
-
-// State success login and get data login
+// State success login and get data
 class UserSuccess extends UserState {
   final List<User> users;
+  final int length;
   final bool hasReachedMax; // warning flag
 
   const UserSuccess({
     this.users = const [],
+    this.length = 0,
     this.hasReachedMax = false,
   });
 
-  UserSuccess copyWith({
-    List<User>? users,
-    bool? hasReachedMax,
-  }) {
-    return UserSuccess(
-      users: users ?? this.users,
-      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
-    );
-  }
-
   @override
-  List<Object> get props => [users];
+  List<Object> get props => [users, length, hasReachedMax];
 }
 
-
+// State loading user error
 class UserError extends UserState {
   final String message;
   const UserError(this.message);
-  
+
   @override
   List<Object> get props => [message];
 }
