@@ -10,5 +10,6 @@ class AppPallet {
   static const Color greyColor = Colors.grey;
   static const Color errorColor = Colors.redAccent;
   static const Color transparentColor = Colors.transparent;
+  static const Color blueCorlor = Color.fromARGB(255, 6, 13, 216);
 
 } 

@@ -16,6 +16,10 @@ class Pokemon extends Equatable {
     );
   }
 
+  String get nameCapitalized {
+    return name[0].toUpperCase() + name.substring(1);
+  }
+
   String get id {
     final parts = url.split('/');
     return parts[parts.length - 2];

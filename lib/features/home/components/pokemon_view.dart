@@ -87,7 +87,7 @@ class _PokemonViewState extends State<PokemonView> {
                   child: Text(
                     'List of Pokemon',
                     style: TextStyle(
-                      color: AppPallet.greyColor,
+                      color: AppPallet.errorColor,
                       fontSize: 50,
                       fontWeight: FontWeight.bold,
                     ),
@@ -110,7 +110,7 @@ class _PokemonViewState extends State<PokemonView> {
                           child: Center(child: CircularProgressIndicator()),
                         );
                       }
-                      
+
                       final pokemon = state.pokemons[index];
                       return PokemonListItem(pokemon: pokemon);
                     },
