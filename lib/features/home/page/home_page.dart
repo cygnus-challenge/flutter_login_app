@@ -17,8 +17,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => PokemonController()..fetchPokemons(),
-      child: PokemonView(authenticatedUser: authenticatedUser),     
+      create: (context) => PokemonController()
+      ..fetchPokemons(),
+      child: PokemonView(authenticatedUser: authenticatedUser), 
     );
   }
 }

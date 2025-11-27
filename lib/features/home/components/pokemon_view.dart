@@ -9,7 +9,10 @@ import '../controller/pokemon_state.dart';
 import 'pokemon_list_item.dart';
 
 class PokemonView extends StatefulWidget {
-  const PokemonView({super.key, required this.authenticatedUser});
+  const PokemonView({
+    super.key, 
+    required this.authenticatedUser
+  });
 
   final User? authenticatedUser;
 
@@ -19,7 +22,6 @@ class PokemonView extends StatefulWidget {
 
 class _PokemonViewState extends State<PokemonView> {
   final ScrollController _scrollController = ScrollController();
-
   @override
   void initState() {
     super.initState();
@@ -69,54 +71,67 @@ class _PokemonViewState extends State<PokemonView> {
       ),
       body: BlocBuilder<PokemonController, PokemonState>(
         builder: (context, state) {
+
+          // Load Init
           if (state is PokemonInitial) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
+
           // Load Success
           if (state is PokemonLoaded) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, 
-                          vertical: 12.0,
-                  ),
-                  child: Text(
-                    'List of Pokemon',
-                    style: TextStyle(
-                      color: AppPallet.errorColor,
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
+            return RefreshIndicator(
+              color: AppPallet.errorColor,
+              backgroundColor: AppPallet.whiteCcolor,
+
+              onRefresh: () async {
+                await context.read<PokemonController>().refreshPokemons();
+              },
+
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, 
+                            vertical: 12.0,
+                    ),
+                    child: Text(
+                      'List of Pokemon',
+                      style: TextStyle(
+                        color: AppPallet.errorColor,
+                        fontSize: 50,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-          
-                // Card List
-                Expanded(
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    itemCount: state.hasReachedMax 
-                      ? state.pokemons.length
-                      : state.pokemons.length + 1,
-        
-                    itemBuilder: (context, index) {
-                      if (index == state.length &&
-                        !state.hasReachedMax) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16.0),
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                      }
-
-                      final pokemon = state.pokemons[index];
-                      return PokemonListItem(pokemon: pokemon);
-                    },
+                        
+                  // Card List
+                  Expanded(
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      controller: _scrollController,
+                      itemCount: state.hasReachedMax 
+                        ? state.pokemons.length
+                        : state.pokemons.length + 1,
+                          
+                      itemBuilder: (context, index) {
+                        if (index == state.length &&
+                          !state.hasReachedMax) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+                  
+                        final pokemon = state.pokemons[index];
+                        return PokemonListItem(pokemon: pokemon);
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
           }   
             // Load fail

@@ -27,6 +27,7 @@ class PokemonLoaded extends PokemonState {
   List<Object> get props => [pokemons, length, hasReachedMax];
 }
 
+// State error when fetch data from API
 class PokemonError extends PokemonState {
   final String message;
 

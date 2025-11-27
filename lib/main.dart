@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Auth with BloC App',
       theme: AppTheme.darkThemeMode,
-      initialRoute: '/login',
+      initialRoute: '/home',
       onGenerateRoute: (settings){
         switch (settings.name) {
           case '/login':

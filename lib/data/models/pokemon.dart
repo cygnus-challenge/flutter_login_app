@@ -16,19 +16,16 @@ class Pokemon extends Equatable {
     );
   }
 
+  String get id {
+    final uri = Uri.parse(url);
+    return uri.pathSegments.lastWhere((element) => element.isNotEmpty);
+  }
+
   String get nameCapitalized {
     return name[0].toUpperCase() + name.substring(1);
-  }
-
-  String get id {
-    final parts = url.split('/');
-    return parts[parts.length - 2];
-  }
-
-  String get imageUrl {
-    return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id.png';
   }
 
   @override
   List<Object> get props => [name, url];
 }
+
