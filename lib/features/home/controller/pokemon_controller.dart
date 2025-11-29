@@ -13,6 +13,14 @@ class PokemonController extends Cubit<PokemonState> {
   bool _isLoadingMore = false;
   final List<Pokemon> _pokemons = [];
 
+  // Refresh Data
+  Future<void> refreshPokemons() async {
+    _isLoadingMore = false;
+    _pokemons.clear();
+    await fetchPokemons();
+  }
+
+  // Fetch Data
   Future<void> fetchPokemons() async {
 
     if (_isLoadingMore) return;
@@ -35,25 +43,4 @@ class PokemonController extends Cubit<PokemonState> {
     _isLoadingMore = false;
   }
 
-  Future<void> refreshPokemons() async {
-    if (_isLoadingMore) return;
-    _isLoadingMore = true;
-    _pokemons.clear();
-
-    final newPokemons = await _repository.fetchPokemons(
-        offset: 0,
-        limit: 20,
-      );
-
-    _pokemons.addAll(newPokemons);
-
-    emit(PokemonLoaded(
-      pokemons: List.of(_pokemons),
-      length: _pokemons.length,
-      hasReachedMax: newPokemons.length < _limit,
-    ));
-
-    _isLoadingMore = false;
-    
-  }
 }

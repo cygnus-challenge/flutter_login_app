@@ -22,6 +22,7 @@ class PokemonView extends StatefulWidget {
 
 class _PokemonViewState extends State<PokemonView> {
   final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +45,12 @@ class _PokemonViewState extends State<PokemonView> {
     }
   }
 
+  Future<void> _onRefresh() async {
+    // Call controller to refresh
+    await context.read<PokemonController>().refreshPokemons();
+      
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,13 +60,14 @@ class _PokemonViewState extends State<PokemonView> {
             ? 'Welcome ${widget.authenticatedUser?.username ?? ''}'
             : 'Home',
           style: TextStyle(
-            color: AppPallet.gradient1,
+            color: AppPallet.homeCorlor,
             fontSize: 30,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
-        foregroundColor: AppPallet.gradient1,
+        backgroundColor: AppPallet.greyColor,
+        foregroundColor: AppPallet.homeCorlor,
+        elevation: 3,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -81,34 +89,30 @@ class _PokemonViewState extends State<PokemonView> {
 
           // Load Success
           if (state is PokemonLoaded) {
-            return RefreshIndicator(
-              color: AppPallet.errorColor,
-              backgroundColor: AppPallet.whiteCcolor,
 
-              onRefresh: () async {
-                await context.read<PokemonController>().refreshPokemons();
-              },
-
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, 
-                            vertical: 12.0,
-                    ),
-                    child: Text(
-                      'List of Pokemon',
-                      style: TextStyle(
-                        color: AppPallet.errorColor,
-                        fontSize: 50,
-                        fontWeight: FontWeight.bold,
-                      ),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, 
+                          vertical: 12.0,
+                  ),
+                  child: Text(
+                    'List of Pokemon',
+                    style: TextStyle(
+                      color: AppPallet.errorColor,
+                      fontSize: 50,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                        
-                  // Card List
-                  Expanded(
+                ),
+                      
+                // Card List
+                Expanded( 
+                  child: RefreshIndicator(
+                    onRefresh: _onRefresh,
+                    color: AppPallet.gradient1,
                     child: ListView.builder(
                       physics: const AlwaysScrollableScrollPhysics(),
                       controller: _scrollController,
@@ -130,23 +134,29 @@ class _PokemonViewState extends State<PokemonView> {
                       },
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           }   
             // Load fail
           if (state is PokemonError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  state.message,
-                  style: const TextStyle(
-                    color: AppPallet.errorColor, 
-                    fontSize: 16,
+            return RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: ListView(
+                children: [
+                  SizedBox(height: MediaQuery.of(context).size.height*0.3),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      state.message,
+                      style: const TextStyle(
+                        color: AppPallet.errorColor, 
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
+                ]
               ),
             );
           }
