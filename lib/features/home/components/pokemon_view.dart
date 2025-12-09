@@ -137,7 +137,6 @@ class _PokemonViewState extends State<PokemonView> {
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        print('Here Home View: $state $context');
                         
                         if (index >= state.pokemons.length) {
                            return LoadingOverlayItem(); 
