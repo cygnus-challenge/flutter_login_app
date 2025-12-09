@@ -1,16 +1,50 @@
 # auth_app
 
-A new Flutter project.
+Project Architecture Overview
 
-## Getting Started
+This project follows a clean and scalable architecture with clear separation of concerns.
+Key principles include networking modularization, functional error handling, local caching, and repository-driven data orchestration.
 
-This project is a starting point for a Flutter application.
+🔌 Networking Layer
 
-A few resources to get you started if this is your first Flutter project:
+DioClient is extracted into the networking/ directory to keep all network-related logic isolated and reusable.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Centralizes base configuration, interceptors, and request handling.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+🧩 Functional Result Handling
+
+Uses a Result pattern (Either) for data handling.
+
+Ensures every API call returns either:
+
+Success(data) or
+
+Failure(error)
+
+Allows clean and predictable state checking following Functional Programming practices.
+
+💾 Local Storage & Caching
+
+Uses shared_preferences to persist data in Local Storage.
+
+Provides:
+
+Lightweight caching
+
+Faster UI rendering
+
+Lower API usage
+
+Ideal for storing small datasets and reducing unnecessary API calls.
+
+🗂 Repository Layer
+
+Repositories orchestrate and manage all data flow.
+
+Responsibilities:
+
+Combine local + remote data sources
+
+Enrich or transform models when needed
+
+Act as the single source of truth for upper layers (UI, Bloc, etc.)
