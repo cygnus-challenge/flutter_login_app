@@ -56,7 +56,7 @@ class _LoginFormState extends State<LoginForm> {
                     child: const Text(
                       'Sign In',
                       style: TextStyle(
-                        color: AppPallet.whiteCcolor,
+                        color: AppPallet.whiteColor,
                         fontSize: 50,
                         fontWeight: FontWeight.bold,
                       ),
