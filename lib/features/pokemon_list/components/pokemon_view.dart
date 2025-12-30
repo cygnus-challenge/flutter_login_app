@@ -8,6 +8,7 @@ import '/../data/models/user.dart';
 import '../controller/pokemon_list_controller.dart';
 import '../controller/pokemon_list_state.dart';
 import 'pokemon_list_item.dart';
+import 'pagination_bar.dart';
 
 class PokemonView extends StatefulWidget {
   const PokemonView({
@@ -85,7 +86,6 @@ class _PokemonViewState extends State<PokemonView> {
       ),
       body: BlocBuilder<PokemonListController, PokemonListState>(
         builder: (context, state) {
-
           // 1. Load Init
           if (state is PokemonListInitial || state is PokemonListLoading) {
             return LoadingOverlayItem();
@@ -111,48 +111,85 @@ class _PokemonViewState extends State<PokemonView> {
 
           // 3. Load Success
           if (state is PokemonListLoaded) {
-            return RefreshIndicator(
-              onRefresh: _onRefresh,
-              color: AppPallet.gradient1,
-              child: CustomScrollView(
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  // --- HEADER TITLE ---
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                      child: Text(
-                        'List of Pokemon',
-                        style: TextStyle(
-                          color: AppPallet.errorColor,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
+            return Column(
+              children: [
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: _onRefresh,
+                    color: AppPallet.gradient1,
+                    child: CustomScrollView(
+                      controller: _scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        // --- HEADER TITLE ---
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                            child: Text(
+                              'List of Pokemon',
+                              style: TextStyle(
+                                color: AppPallet.errorColor,
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        // --- LIST
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              
+                              if (index >= state.pokemons.length) {
+                                 return LoadingOverlayItem(); 
+                              }
+                              
+                              return PokemonListItem(pokemon: state.pokemons[index]); 
+                            },
+                            
+                            childCount: state.hasReachedMax
+                                ? state.pokemons.length
+                                : state.pokemons.length + 1,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                ),
 
-                  // --- LIST
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
+                
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppPallet.whiteColor, 
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppPallet.transparentColor,
+                        offset: const Offset(0, -4),
+                        blurRadius: 10,
+                      )
+                    ]
+                  ),
+                  padding: const EdgeInsets.only(bottom: 16, top: 8),
+                  child: SafeArea( 
+                    top: false, 
+                    child: PaginationBar(
+                      totalPages: state.totalPages,
+                      currentPage: state.currentPage,
+                      onPageSelected: (page) {
+                        context.read<PokemonListController>().goToPage(page);
                         
-                        if (index >= state.pokemons.length) {
-                           return LoadingOverlayItem(); 
+                        if (_scrollController.hasClients) {
+                          _scrollController.animateTo(
+                            0, 
+                            duration: const Duration(milliseconds: 300), 
+                            curve: Curves.easeOut
+                          );
                         }
-
-                        final pokemon = state.pokemons[index];
-                        return PokemonListItem(pokemon: pokemon); 
                       },
-                      
-                      childCount: state.hasReachedMax
-                          ? state.pokemons.length
-                          : state.pokemons.length + 1,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           }
            

@@ -19,13 +19,21 @@ class PokemonListLoaded extends PokemonListState {
   final int length;
   final bool hasReachedMax; 
   final bool isLoadingMore;
+  final int totalCount; // total items
+  final int currentPage;
+  final int limit; // to calculate total page
 
   const PokemonListLoaded({
     this.pokemons = const <Pokemon>[],
     this.length = 0,
     this.hasReachedMax = false,
     this.isLoadingMore = false,
+    this.totalCount = 0,
+    this.currentPage = 0,
+    this.limit = 1,
   });
+
+  int get totalPages => (totalCount / limit).ceil();
 
   // Helper function (keep UI smooth)
   PokemonListLoaded copyWith({
@@ -33,6 +41,9 @@ class PokemonListLoaded extends PokemonListState {
     int? lenght,
     bool? hasReachedMax,
     bool? isLoadingMore,
+    int? totalCount,
+    int? currentPage,
+    int? limit,
   }) {
     return PokemonListLoaded(
       pokemons: pokemons ?? this.pokemons,
@@ -43,7 +54,7 @@ class PokemonListLoaded extends PokemonListState {
   }
 
   @override
-  List<Object> get props => [pokemons, length, hasReachedMax, isLoadingMore];
+  List<Object> get props => [pokemons, length, hasReachedMax, isLoadingMore, totalCount, currentPage, limit];
 }
 
 // State error when fetch data from API

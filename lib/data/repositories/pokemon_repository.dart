@@ -20,20 +20,15 @@ class PokemonRepository {
   String _detailKey(int id) => 'detail_$id';
 
   // --- GET LIST (Logic: Smart Cache & Fallback)---
-  Future<Result<List<Pokemon>>> getPokemonList({
-    bool forceRefreresh = false, 
+  Future<Result<PokemonResponse>> getPokemonList({
     required int offset, 
     required int limit
     }) async {
-      final isFirstPage = offset == 0;
 
       // 1. Check Cache: 
-      // First page + no forced refresh → use cache for faster rendering
-      if (isFirstPage && !forceRefreresh) {
-        final cachedData = _getCachedList();
-        if (cachedData != null && cachedData.isNotEmpty) {
-          return Success(cachedData);
-        }
+      final cachedData = _getCachedList();
+      if (cachedData != null && cachedData.isNotEmpty) {
+        return Success(PokemonResponse(pokemons: cachedData, totalCount: cachedData.length));
       }
 
       // 2. Call API
@@ -43,31 +38,20 @@ class PokemonRepository {
           queryParameters: {'offset': offset, 'limit': limit},
         );
 
+        final int totalCount = response.data['count'] as int;
+
         final List results = response.data['results'] as List;
         final remoteData = results.map((e) => Pokemon.fromJson(e)).toList();
 
-        // 3. Save Cache (Only the first page is cached to optimze performance)
-        if (isFirstPage) {
-          await _localStorage.saveObjecList(_kListKey, remoteData, (e) => e.toJson());
-        }
+        // 3. Save Cache 
+        await _localStorage.saveObjecList(_kListKey, remoteData, (e) => e.toJson());
 
-        return Success(remoteData);
+        return Success(PokemonResponse(pokemons: remoteData, totalCount: totalCount));
 
-      } on DioException catch (e) {
-
-        // 4. Fall back:
-        // On API error, fall back to cache when this is the first page
-        if (isFirstPage) {
-          final cachedData = _getCachedList();
-          if (cachedData != null && cachedData.isNotEmpty) {
-            return Success(cachedData);
-          }
-        }
-        return Failure(_mapDioError(e));
       } catch (e) {
         return Failure('Unknown error: $e');
       }
-    }
+  }
 
   // --- GET DETAIL (Logic: Stale-While-Revalidate OR Cache Priority) ---
   Future<Result<PokemonDetails>> getPokemonDetail(int id) async{
@@ -91,8 +75,6 @@ class PokemonRepository {
       await _updateListCacheWithDetail(id, pokemonDetail);
 
       return Success(pokemonDetail);  
-    } on DioException catch (e) {
-      return Failure(_mapDioError(e));
     } catch (e) {
       return Failure('Load detail FAILED: $e');
     }
@@ -129,18 +111,10 @@ class PokemonRepository {
     return _localStorage.getObjList(_kListKey, (json) => Pokemon.fromJson(json));
   }
 
-  // Helper: Show errors
-  String _mapDioError(DioException e) {
-    switch (e.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.receiveTimeout:
-        return 'The connection has timed out. Please check your connection.';
-      case DioExceptionType.connectionError:
-        return 'No network connection.';
-      case DioExceptionType.badResponse:
-        return 'Server error (${e.response?.statusCode}).';
-      default:
-        return 'Network error';
-    }
-  }
+}
+
+class PokemonResponse {
+  final List<Pokemon> pokemons;
+  final int totalCount;
+  PokemonResponse({required this.pokemons, required this.totalCount});
 }

@@ -16,9 +16,7 @@ class PokemonSingleController extends Cubit<PokemonSingleState> {
   // Function to load detail and merge it into the current Pokémon
   Future<void> loadPokemonDetail() async {
 
-    // 1. SMART CHECK (Performance optimization):
-    // If this Pokémon already has details (because the Repository enriched the cached list previously)
-    // → Skip, do nothing. The UI will display immediately.
+    // 1. Check if details already exist
     if (state.pokemon.details != null) return;
 
     // 2. Emit loading -> show Spinner

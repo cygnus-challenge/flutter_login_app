@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '/../core/theme/theme.dart';
 import '/../injection_container.dart';
 import '/../data/models/user.dart';
-import '/../features/home/page/home_page.dart';
+import 'features/pokemon_list/page/home_page.dart';
 import '/../features/auth/page/login_page.dart';
 
 void main() async {
